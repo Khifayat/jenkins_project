@@ -5,6 +5,7 @@ pipeline{
     }
     stages{
         stage("mvn test"){
+            steps{
             checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Khifayat/jenkins_project']])
             
             sh "mvn -version"
@@ -14,6 +15,7 @@ pipeline{
                 sh "mvn clean install"
             }
         }
+    }
 
         stage("Build the basic docker file"){
             steps{
