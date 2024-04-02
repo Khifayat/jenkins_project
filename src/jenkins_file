@@ -1,0 +1,38 @@
+pipeline{
+    agent any 
+    tools{
+    maven "maven_3_9_6"
+    }
+    stages{
+        stage("mvn test"){
+            checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Khifayat/jenkins_project']])
+            
+            sh "mvn -version"
+
+            dir{
+                dir("/Users/khifayatabolurin/Desktop/SoftwareEngineering/jenkins_proj/jenkins")
+                sh "mvn clean install"
+            }
+        }
+
+        stage("Build the basic docker file"){
+            steps{
+                dir("/Users/khifayatabolurin/Desktop/SoftwareEngineering/jenkins_proj/jenkins")
+                   sh "docker build -t khifayat/presentation_hub ."
+            }
+        }
+        stage("push the image to docker hub"){
+            steps{
+            withCredentials([string(credentialsId: 'dockerPass', variable: 'password')]) {
+                sh "docker login -u khifayat -p %password%."
+                sh "docker build -t khifayat/presentation_hub ."
+             }
+         }
+     }
+  }
+  post[
+    always[
+        clearWs()
+    ]
+  ]
+}
